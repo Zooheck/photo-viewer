@@ -1,9 +1,13 @@
 import React, { Component } from 'react'
+
+// MATERIAL-UI
 import TextField from 'material-ui/TextField'
 import SelectField from 'material-ui/SelectField'
 import MenuItem from 'material-ui/MenuItem'
 
 import axios from 'axios'
+
+import ImageResults from '../ImageResults/ImageResults.js'
 
 export default class Search extends Component {
   state = {
@@ -19,13 +23,17 @@ export default class Search extends Component {
     this.setState({
       [name]: [value]
     }, () => {
-      axios.get(`${this.state.apiUrl}/?key=${this.state.apiKey}&q=${this.state.searchText}&image_type=photo&per_page=${this.state.amount}&safesearch=true`)
-        .then(res => {
-          this.setState({ images: res.data.hits})
-        })
-        .catch(err => {
-          console.log(err)
-        })
+      if(value === '') {
+        this.setState({ images: []})
+      } else {
+        axios.get(`${this.state.apiUrl}/?key=${this.state.apiKey}&q=${this.state.searchText}&image_type=photo&per_page=${this.state.amount}&safesearch=true`)
+          .then(res => {
+            this.setState({ images: res.data.hits})
+          })
+          .catch(err => {
+            console.log(err)
+          })
+      }
     })
   }
   handleSelect = (e, index, value) => {
@@ -55,6 +63,8 @@ export default class Search extends Component {
           <MenuItem value={30} primaryText="30" />
           <MenuItem value={50} primaryText="50" />
         </SelectField>
+        <br />
+        {this.state.images.length > 0 && (<ImageResults images ={this.state.images}/>)}
       </div>
     )
   }
